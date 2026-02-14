@@ -33,7 +33,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const user = await createUser(name, email, password,bio,location,avatar)
+    const user = await createUser(name, email, password)
 
     if (!user) {
       return NextResponse.json(

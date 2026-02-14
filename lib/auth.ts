@@ -9,7 +9,7 @@ export function hashPassword(password: string): string {
 }
 
 export function verifyPassword(password: string, hash: string): boolean {
-  return password === hash
+  return hashPassword(password) === hash
 }
 
 export function generateToken(): string {
@@ -70,9 +70,6 @@ export async function createUser(
   name: string,
   email: string,
   password: string,
-  bio:string,
-  location:string,
-  avatar:string
 ): Promise<User | null> {
   // Check if user already exists
   if ( await getUserByEmail(email)) {
