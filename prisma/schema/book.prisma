@@ -12,7 +12,7 @@ model Book {
   location    String
   status      Status   @default(available)
   rating      Float    @default(0)
-  reviews     Int      @default(0)
+  reviews     Review[]
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }

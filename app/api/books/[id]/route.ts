@@ -1,12 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { db } from '@/lib/db'
+import { prisma } from '@/lib/prisma'
 
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params
-  const book = db.books.find((b) => b.id === id)
+  const book = await prisma.book.findUnique({
+    where: {
+      id
+    }
+  })
 
   if (!book) {
     return NextResponse.json({ error: 'Book not found' }, { status: 404 })

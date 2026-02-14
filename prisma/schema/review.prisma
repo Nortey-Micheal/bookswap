@@ -1,0 +1,9 @@
+model Review {
+  id         String   @id @default(uuid())
+  book_id    String
+  book       Book     @relation(fields: [book_id], references: [id])
+  user_name  String
+  rating     Float
+  comment    String
+  created_at DateTime
+}
