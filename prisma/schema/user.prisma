@@ -1,0 +1,16 @@
+model User {
+  id               String   @id @default(uuid())
+  name             String
+  email            String   @unique
+  password         String
+  location         String
+  avatar           String
+  bio              String
+  rating           Float
+  reviews_count    Int
+  books_shared     Int
+  member_since     DateTime
+  wishlist         String[]
+  active_exchanges String[]
+  books            Book[]
+}
