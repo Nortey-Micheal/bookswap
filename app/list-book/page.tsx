@@ -51,7 +51,6 @@ export default function ListBookPage() {
 
       if (res.ok) {
         const data = await res.json()
-        alert('Book listed successfully!')
         router.push(`/book/${data.book.id}`)
       } else {
         alert('Failed to list book')

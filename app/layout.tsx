@@ -1,8 +1,9 @@
 import type { Metadata } from 'next'
 import { Geist, Geist_Mono } from 'next/font/google'
-import { AuthProvider } from '@/lib/auth-context'
 
 import './globals.css'
+import { Toaster } from 'sonner'
+import ReduxProvider from '@/lib/store/provider'
 
 const _geist = Geist({ subsets: ['latin'] })
 const _geistMono = Geist_Mono({ subsets: ['latin'] })
@@ -27,7 +28,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="font-sans antialiased">
-        <AuthProvider>{children}</AuthProvider>
+        <Toaster position="top-center" richColors/>
+        <ReduxProvider>
+          <div className="w-full">{children}</div>
+        </ReduxProvider>
       </body>
     </html>
   )

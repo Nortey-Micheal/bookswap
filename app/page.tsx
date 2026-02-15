@@ -2,32 +2,32 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { useAuth } from "@/lib/auth-context";
 import { useRouter } from "next/navigation";
 import { Navbar } from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
 import {
   ArrowRight,
-  Book,
+  BookIcon,
+  TrendingUp,
   Users,
   Zap,
-  TrendingUp,
-  CheckCircle,
 } from "lucide-react";
-import type { Book } from "@/lib/db";
+import type {  Book } from "@/lib/generated/prisma/client";
+import { useSelector } from "react-redux";
+import { StoreType } from "@/lib/store";
 
 export default function Home() {
-  const { isAuthenticated, isLoading: authLoading } = useAuth();
+  const user = useSelector((state:StoreType) => state.user);
   const router = useRouter();
   const [featuredBooks, setFeaturedBooks] = useState<Book[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   // Redirect authenticated users to dashboard
   useEffect(() => {
-    if (!authLoading && isAuthenticated) {
+    if (!user.id) {
       router.push("/dashboard");
     }
-  }, [isAuthenticated, authLoading, router]);
+  }, [user.id, router]);
 
   useEffect(() => {
     const fetchBooks = async () => {
@@ -45,16 +45,6 @@ export default function Home() {
     fetchBooks();
   }, []);
 
-  if (authLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <div className="text-center">
-          <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-          <p className="mt-4 text-muted-foreground">Loading...</p>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <main className="min-h-screen bg-background">
@@ -102,7 +92,7 @@ export default function Home() {
               <div className="absolute inset-0 bg-gradient-to-br from-accent/30 to-primary/30 rounded-3xl blur-3xl" />
               <div className="relative bg-gradient-to-br from-accent to-primary/40 rounded-3xl h-full flex items-center justify-center p-8">
                 <div className="text-center">
-                  <Book className="w-24 h-24 text-white/80 mx-auto mb-4" />
+                  <BookIcon className="w-24 h-24 text-white/80 mx-auto mb-4" />
                   <p className="text-white/70 font-medium">
                     Your Library Awaits
                   </p>
@@ -196,7 +186,7 @@ export default function Home() {
                 >
                   <div className="relative aspect-video bg-muted overflow-hidden">
                     <img
-                      src={book.cover}
+                      src={book?.cover!}
                       alt={book.title}
                       className="w-full h-full object-cover"
                     />
@@ -217,7 +207,7 @@ export default function Home() {
                           {book.rating.toFixed(1)}
                         </span>
                         <span className="text-xs text-muted-foreground">
-                          ({book.reviews})
+                          reviews
                         </span>
                       </div>
                     </div>

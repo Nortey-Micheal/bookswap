@@ -39,16 +39,13 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const newBook = {
-      id: `book-${Date.now()}`,
-      ...body,
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-      rating: 0,
-      reviews: 0,
-    }
+    const newBook = await prisma.book.create({
+      data: {
+        ...body
+      }
+    })
 
-    db.books.push(newBook)
+    
     return NextResponse.json({ book: newBook }, { status: 201 })
   } catch (error) {
     return NextResponse.json({ error: 'Failed to create book' }, { status: 400 })

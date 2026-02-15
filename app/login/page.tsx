@@ -1,23 +1,26 @@
 'use client'
 
 import { useState } from 'react'
-import { useAuth } from '@/lib/auth-context'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { BookOpen, AlertCircle, Mail, Lock } from 'lucide-react'
+import { useLogin } from '@/hooks/auth/useLogin'
+import { StoreType } from '@/lib/store'
+import { useSelector } from 'react-redux'
 
 export default function LoginPage() {
   const router = useRouter()
-  const { login, isAuthenticated } = useAuth()
+  const { login,  } = useLogin()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [showDemo, setShowDemo] = useState(true)
+ const user = useSelector((state:StoreType) => state.user)
 
-  if (isAuthenticated) {
+  if (user.id) {
     router.replace('/dashboard')
     return null
   }

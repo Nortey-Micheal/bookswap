@@ -1,24 +1,27 @@
 'use client'
 
 import { useState } from 'react'
-import { useAuth } from '@/lib/auth-context'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { BookOpen, AlertCircle, Mail, Lock, User, Check } from 'lucide-react'
+import { useSignup } from '@/hooks/auth/useSignup'
+import { useSelector } from 'react-redux'
+import { StoreType } from '@/lib/store'
 
 export default function SignupPage() {
   const router = useRouter()
-  const { signup, isAuthenticated } = useAuth()
+  const { signup } = useSignup()
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [error, setError] = useState('')
   const [isLoading, setIsLoading] = useState(false)
+  const user = useSelector((state:StoreType) => state.user)
 
-  if (isAuthenticated) {
+  if (user.id) {
     router.replace('/dashboard')
     return null
   }
@@ -29,7 +32,7 @@ export default function SignupPage() {
     setIsLoading(true)
 
     try {
-      await signup(name, email, password, confirmPassword)
+      await signup({name, email, password, confirmPassword})
       router.push('/dashboard')
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Signup failed')

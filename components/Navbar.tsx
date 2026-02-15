@@ -2,15 +2,18 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { useAuth } from '@/lib/auth-context'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { BookOpen, LogOut, Menu, X, User, Heart, BarChart3 } from 'lucide-react'
+import { useSelector } from 'react-redux'
+import { StoreType } from '@/lib/store'
+import { useLogout } from '@/hooks/auth/useLogout'
 
 export function Navbar() {
-  const { user, isAuthenticated, logout } = useAuth()
+  const user = useSelector((state:StoreType) => state.user)
   const router = useRouter()
   const [isOpen, setIsOpen] = useState(false)
+  const { logout } = useLogout()
 
   const handleLogout = async () => {
     await logout()
@@ -23,7 +26,7 @@ export function Navbar() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
-          <Link href={isAuthenticated ? '/dashboard' : '/'} className="flex items-center gap-2 font-bold text-xl text-foreground hover:text-primary transition-colors">
+          <Link href={user.id? '/dashboard' : '/'} className="flex items-center gap-2 font-bold text-xl text-foreground hover:text-primary transition-colors">
             <div className="bg-primary rounded-lg p-2">
               <BookOpen className="w-5 h-5 text-white" />
             </div>
@@ -32,7 +35,7 @@ export function Navbar() {
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center gap-2">
-            {isAuthenticated ? (
+            {user.id ? (
               <>
                 <Link href="/dashboard">
                   <Button variant="ghost" className="text-foreground">Dashboard</Button>
@@ -90,7 +93,7 @@ export function Navbar() {
         {/* Mobile Navigation */}
         {isOpen && (
           <div className="md:hidden pb-4 space-y-2">
-            {isAuthenticated ? (
+            {user.id ? (
               <>
                 <Link href="/dashboard" onClick={() => setIsOpen(false)}>
                   <Button variant="ghost" className="w-full justify-start text-foreground">

@@ -1,6 +1,5 @@
 'use client'
 
-import { useAuth } from '@/lib/auth-context'
 import { ProtectedRoute } from '@/components/ProtectedRoute'
 import { Navbar } from '@/components/Navbar'
 import { Button } from '@/components/ui/button'
@@ -8,9 +7,11 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { Plus, BookOpen, Send, Heart, Users, TrendingUp, Search } from 'lucide-react'
 import type { Book } from '@/lib/db'
+import { useSelector } from 'react-redux'
+import { StoreType } from '@/lib/store'
 
 export default function DashboardPage() {
-  const { user } = useAuth()
+  const user = useSelector((state:StoreType) => state.user)
   const [books, setBooks] = useState<Book[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState('')
