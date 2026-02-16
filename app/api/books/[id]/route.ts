@@ -9,6 +9,14 @@ export async function GET(
   const book = await prisma.book.findUnique({
     where: {
       id
+    },
+    include: {
+      reviews: true,
+      owner: {
+        select: {
+          name: true
+        }
+      },
     }
   })
 
@@ -16,7 +24,11 @@ export async function GET(
     return NextResponse.json({ error: 'Book not found' }, { status: 404 })
   }
 
-  const reviews = db.reviews.filter((r) => r.book_id === id)
+  const reviews = await prisma.review.findMany({
+    where: {
+      book_id: id
+    }
+  })
 
   return NextResponse.json({ book, reviews })
 }

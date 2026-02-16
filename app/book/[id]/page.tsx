@@ -8,9 +8,20 @@ import { Navbar } from '@/components/Navbar'
 import { ProtectedRoute } from '@/components/ProtectedRoute'
 import { Button } from '@/components/ui/button'
 import { Star, Heart, Share2, MapPin, Award } from 'lucide-react'
-import type { Book } from '@/lib/db'
 import { Footer } from '@/components/Footer'
 import { Navigation } from '@/components/Navigation'
+import { useSelector } from 'react-redux'
+import { StoreType } from '@/lib/store'
+import type { Prisma } from '@/lib/generated/prisma/client'
+import { formatDate } from 'date-fns'
+
+type BookFull = Prisma.BookGetPayload<{
+  include: {
+    owner: true;
+    reviews: true;
+  };
+}>;
+
 
 interface Review {
   id: string
@@ -23,12 +34,13 @@ interface Review {
 export default function BookDetailPage() {
   const params = useParams()
   const bookId = params.id as string
-  const [book, setBook] = useState<Book | null>(null)
+  const [book, setBook] = useState<BookFull | null>(null)
   const [reviews, setReviews] = useState<Review[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [isFavored, setIsFavored] = useState(false)
   const [showReviewForm, setShowReviewForm] = useState(false)
   const [newReview, setNewReview] = useState({ rating: 5, comment: '' })
+  const user = useSelector((state:StoreType) => state.user)
 
   useEffect(() => {
     const fetchBook = async () => {
@@ -56,8 +68,8 @@ export default function BookDetailPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           bookId: book.id,
-          userId: 'user-1',
-          userName: 'You',
+          userId: user.id,
+          userName: user.name,
           rating: newReview.rating,
           comment: newReview.comment,
         }),
@@ -81,7 +93,7 @@ export default function BookDetailPage() {
 
   const handleExchange = async () => {
     if (!book) return
-    alert(`Exchange request sent to ${book.owner_name}! Check your exchanges page for updates.`)
+    alert(`Exchange request sent to ${book.owner.name}! Check your exchanges page for updates.`)
   }
 
   if (isLoading) {
@@ -149,7 +161,7 @@ export default function BookDetailPage() {
               <Image
                 // width={500}
                 // height={500}
-                src={book.cover}
+                src={book.cover!}
                 alt={book.title}
                 fill
                 className="object-cover"
@@ -208,7 +220,7 @@ export default function BookDetailPage() {
                     ))}
                   </div>
                   <span className="font-semibold">{book.rating}</span>
-                  <span className="text-muted-foreground">({book.reviews} reviews)</span>
+                  <span className="text-muted-foreground">({book.reviews.length} reviews)</span>
                 </div>
               </div>
             </div>
@@ -235,7 +247,7 @@ export default function BookDetailPage() {
                 <p className="text-xs text-muted-foreground uppercase font-semibold mb-1">
                   Listed
                 </p>
-                <p className="text-foreground">{new Date(book.created_at).toLocaleDateString()}</p>
+                <p className="text-foreground">{formatDate(new Date(book.createdAt),'dd MMM yyyy')}</p>
               </div>
               <div>
                 <p className="text-xs text-muted-foreground uppercase font-semibold mb-1">
@@ -254,12 +266,12 @@ export default function BookDetailPage() {
             {/* Owner Card */}
             <div className="p-6 bg-card rounded-lg border border-border">
               <h3 className="text-lg font-bold text-secondary mb-4">Book Owner</h3>
-              <Link href={`/profile/${book.owner_id}`}>
+              <Link href={`/profile/${book.ownerId}`}>
                 <div className="cursor-pointer hover:opacity-80 transition-opacity">
-                  <p className="font-bold text-foreground">{book.owner_name}</p>
+                  <p className="font-bold text-foreground">{book.owner.name}</p>
                   <div className="flex items-center gap-1 text-muted-foreground my-1">
                     <MapPin className="w-4 h-4" />
-                    {book.owner_location}
+                    {book.location}
                   </div>
                   <div className="flex items-center gap-1 text-muted-foreground">
                     <Award className="w-4 h-4" />
