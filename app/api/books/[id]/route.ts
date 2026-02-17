@@ -40,19 +40,24 @@ export async function PUT(
   try {
     const { id } = await params
     const body = await request.json()
-    const bookIndex = db.books.findIndex((b) => b.id === id)
+    const book = await prisma.book.update({
+      data: {...body},
+      where: {
+        id
+      },
+      include: {
+        owner: {
+          select: {
+            name: true
+          }
+        },
+        reviews: true
+      }
+    }) 
 
-    if (bookIndex === -1) {
-      return NextResponse.json({ error: 'Book not found' }, { status: 404 })
-    }
+    
 
-    db.books[bookIndex] = {
-      ...db.books[bookIndex],
-      ...body,
-      updated_at: new Date().toISOString(),
-    }
-
-    return NextResponse.json({ book: db.books[bookIndex] })
+    return NextResponse.json({ book })
   } catch (error) {
     return NextResponse.json({ error: 'Failed to update book' }, { status: 400 })
   }
@@ -63,12 +68,13 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params
-  const bookIndex = db.books.findIndex((b) => b.id === id)
+  const book = await prisma.book.delete({
+    where: {id}
+  })
 
-  if (bookIndex === -1) {
+  if (!book) {
     return NextResponse.json({ error: 'Book not found' }, { status: 404 })
   }
 
-  db.books.splice(bookIndex, 1)
   return NextResponse.json({ success: true })
 }
